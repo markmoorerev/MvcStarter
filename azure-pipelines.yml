@@ -15,22 +15,42 @@ steps:
     command: 'publish'
     publishWebProjects: true
 
+# 0. STEPS TO SET UP TEST PUBLICATIOON TO SONARCLOUD....
 # 1. download Sonarcloud from Visual Studio Marketplace
 # 2. configure endpoints for the Prepare Analysis Config for SonraCloud Service
+# 3. go to service Connections -> SonarCloud.
+# 4. add a new Service connection after getting the token from SonarCloud.
+# 5. Give the connection an identifiable name
+# 6. Save and return to edit the pipeline to add Prepare Analysis Configuration.
+# 7. Select teh correct endpoint and Org from Sonarcloud task panel.
+# 8. Get the project key. (it's the url AFTER the '?=' )
+# 9. Choose Integrate wth MSBuild and enter Project Key
+# 10. Enter the project name. it's what it's called in SonarCloud
+# 11. Use a script to build the project for testing
+# 12. 
 
-# - task: SonarCloudPrepare@1
-#   inputs:
-#     SonarCloud: marmoorerev
-#     organization: 'Mark Moore'
-#     scannerMode: MSBuild
-#     projectKey: markmoorerev_MvcStarter
-#     projectName: MvcStarter
-#     extraProperties: |
-#       sonar.exclusions=**/lib/**
-#   displayName: sonarcloud analysis prepare
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'MvcStarterServiceConnection'
+    organization: 'markmoorerev'
+    scannerMode: 'MSBuild'
+    projectKey: 'markmoorerev_MvcStarter'
+    projectName: 'MvcStarter'
+  displayName: sonarcloud analysis prepare
+
+- script: dotnet build $(solutionPath)
+    --configuration $(buildConfiguration)
+  displayName: dotnet build
+
+#there might need to be NIcks script to run the test
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: 'MvcProjectStarter/MvcProjectStarter.sln'
+    testRunTitle: 'running tests'
 
 - task: SonarCloudAnalyze@1
-displayName: sonarcloud analysis run
+  displayName: sonarcloud analysis run
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
