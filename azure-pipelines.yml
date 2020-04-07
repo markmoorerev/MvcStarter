@@ -15,7 +15,8 @@ steps:
     command: 'publish'
     publishWebProjects: true
 
-
+# 1. download Sonarcloud from Visual Studio Marketplace
+# 2. configure endpoints for the Prepare Analysis Config for SonraCloud Service
 
 # - task: SonarCloudPrepare@1
 #   inputs:
