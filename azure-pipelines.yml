@@ -15,16 +15,18 @@ steps:
     command: 'publish'
     publishWebProjects: true
 
-- task: SonarCloudPrepare@1
-  inputs:
-    SonarCloud: marmoorerev
-    organization: 'Mark Moore'
-    scannerMode: MSBuild
-    projectKey: markmoorerev_MvcStarter
-    projectName: MvcStarter
-    extraProperties: |
-      sonar.exclusions=**/lib/**
-  displayName: sonarcloud analysis prepare
+
+
+# - task: SonarCloudPrepare@1
+#   inputs:
+#     SonarCloud: marmoorerev
+#     organization: 'Mark Moore'
+#     scannerMode: MSBuild
+#     projectKey: markmoorerev_MvcStarter
+#     projectName: MvcStarter
+#     extraProperties: |
+#       sonar.exclusions=**/lib/**
+#   displayName: sonarcloud analysis prepare
 
 - task: SonarCloudAnalyze@1
 displayName: sonarcloud analysis run
