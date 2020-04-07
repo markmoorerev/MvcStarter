@@ -38,8 +38,7 @@ steps:
     projectName: 'MvcStarter'
   displayName: sonarcloud analysis prepare
 
-- script: dotnet build $(solutionPath)
-    --configuration $(buildConfiguration)
+- script: dotnet build 'MvcProjectStarter/MvcProjectStarter.sln'
   displayName: dotnet build
 
 #there might need to be NIcks script to run the test
