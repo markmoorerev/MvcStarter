@@ -15,19 +15,18 @@ steps:
     command: 'publish'
     publishWebProjects: true
 
-# 0. STEPS TO SET UP TEST PUBLICATIOON TO SONARCLOUD....
-# 1. download Sonarcloud from Visual Studio Marketplace
+# 0. STEPS TO SET UP TEST AND PUBLICATIOON TO SONARCLOUD....
+# 1. Download Sonarcloud from Visual Studio Marketplace
 # 2. configure endpoints for the Prepare Analysis Config for SonraCloud Service
 # 3. go to service Connections -> SonarCloud.
 # 4. add a new Service connection after getting the token from SonarCloud.
 # 5. Give the connection an identifiable name
 # 6. Save and return to edit the pipeline to add Prepare Analysis Configuration.
-# 7. Select teh correct endpoint and Org from Sonarcloud task panel.
-# 8. Get the project key. (it's the url AFTER the '?=' )
-# 9. Choose Integrate wth MSBuild and enter Project Key
+# 7. Select the correct endpoint and Organization from Sonarcloud task panel. -->
+# 8. Get the project key. (it's in the url AFTER the '?=' )
+# 9. Choose 'Integrate wth MSBuild' and the enter the Project Key below
 # 10. Enter the project name. it's what it's called in SonarCloud
 # 11. Use a script to build the project for testing
-# 12. 
 
 - task: SonarCloudPrepare@1
   inputs:
@@ -38,19 +37,22 @@ steps:
     projectName: 'MvcStarter'
   displayName: sonarcloud analysis prepare
 
+# 11. Use a script to build the project for testing
 - script: dotnet build 'MvcProjectStarter/MvcProjectStarter.sln'
   displayName: dotnet build
 
-#there might need to be NIcks script to run the test
+#run the tests you have. this automatically creates an artifact to analyze.
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
     projects: 'MvcProjectStarter/MvcProjectStarter.sln'
     testRunTitle: 'running tests'
 
+#run the sonarcloud analysis on the test artifact
 - task: SonarCloudAnalyze@1
   displayName: sonarcloud analysis run
 
+#based on if the preious step succeeded, 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
@@ -58,6 +60,7 @@ steps:
     testResultsFiles: $(Common.TestResultsDirectory)/*.trx
   displayName: test results build publish
 
+# publish results to a coburtura.xml. this is used in SonarCloud
 - task: PublishCodeCoverageResults@1
   condition: succeededOrFailed()
   inputs:
@@ -65,16 +68,19 @@ steps:
     summaryFileLocation: $(Common.TestResultsDirectory)/*/coverage.cobertura.xml
   displayName: code coverage build publish
 
+# use the .xml from the previous step to publish to SonarCloud
 - task: SonarCloudPublish@1
   condition: succeededOrFailed()
   displayName: sonarcloud results build publish
 
+# run th esame tests for Azure analisis
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
     projects: 'MvcProjectStarter/MvcProjectStarter.sln'
     testRunTitle: 'running tests'
 
+# publish the website to the Azure App Service.
 - task: AzureRmWebAppDeployment@4
   inputs:
     ConnectionType: 'AzureRM'
